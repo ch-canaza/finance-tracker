@@ -31,7 +31,7 @@ class User < ApplicationRecord
 
   def self.search(param)
     param.strip!
-    to_send_back = (first_name_matches(param) + last_name_matches(param) + email_matches(para)).uniq
+    to_send_back = (first_name_matches(param) + last_name_matches(param) + email_matches(param)).uniq
     return nil unless to_send_back
 
     to_send_back
@@ -46,11 +46,16 @@ class User < ApplicationRecord
   end
 
   def self.email_matches(param)
-    matches('email_name', param)
+    matches('email', param)
   end
 
   # '%' wildcard that helps matching strings
   def self.matches(field_name, param)
     where("#{field_name} like ?", "%#{param}%")
+  end
+
+  # excludes current user from results to show in UI
+  def except_current_user(users)
+    users.reject { |user| user.id == self.id }
   end
 end
